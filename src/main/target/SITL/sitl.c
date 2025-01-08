@@ -77,10 +77,15 @@ static pthread_mutex_t updateLock;
 static pthread_mutex_t mainLoopLock;
 static char simulator_ip[32] = "127.0.0.1";
 
-#define PORT_PWM_RAW    9001    // Out
-#define PORT_PWM        9002    // Out
-#define PORT_STATE      9003    // In
-#define PORT_RC         9004    // In
+#define DEFAULT_PORT_PWM_RAW    9001    // Out
+#define DEFAULT_PORT_PWM        9002    // Out
+#define DEFAULT_PORT_STATE      9003    // In
+#define DEFAULT_PORT_RC         9004    // In
+
+static int PORT_PWM_RAW = DEFAULT_PORT_PWM_RAW;
+static int PORT_PWM = DEFAULT_PORT_PWM;
+static int PORT_STATE = DEFAULT_PORT_STATE;
+static int PORT_RC = DEFAULT_PORT_RC;
 
 int targetParseArgs(int argc, char * argv[])
 {
@@ -285,6 +290,32 @@ static void* tcpThread(void* data)
 void systemInit(void)
 {
     int ret;
+
+    // Read env variables for ports
+    char* env_port_pwm_raw = getenv("PORT_PWM_RAW");
+    if (env_port_pwm_raw != NULL) {
+        PORT_PWM_RAW = atoi(env_port_pwm_raw);
+    }
+
+    char* env_port_pwm = getenv("PORT_PWM");
+    if (env_port_pwm != NULL) {
+        PORT_PWM = atoi(env_port_pwm);
+    }
+
+    char* env_port_state = getenv("PORT_STATE");
+    if (env_port_state != NULL) {
+        PORT_STATE = atoi(env_port_state);
+    }
+
+    char* env_port_rc = getenv("PORT_RC");
+    if (env_port_rc != NULL) {
+        PORT_RC = atoi(env_port_rc);
+    }
+
+    printf("[SITL] PORT_PWM_RAW: %d\n", PORT_PWM_RAW);
+    printf("[SITL] PORT_PWM: %d\n", PORT_PWM);
+    printf("[SITL] PORT_STATE: %d\n", PORT_STATE);
+    printf("[SITL] PORT_RC: %d\n", PORT_RC);
 
     clock_gettime(CLOCK_MONOTONIC, &start_time);
     printf("[system]Init...\n");
